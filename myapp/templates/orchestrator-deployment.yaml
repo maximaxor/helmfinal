@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orchestrator
+  labels:
+    app: orchestrator
+spec:
+  replicas: {{ .Values.orchestrator.replicaCount }}
+  selector:
+    matchLabels:
+      app: orchestrator
+  template:
+    metadata:
+      labels:
+        app: orchestrator
+    spec:
+      containers:
+      - name: orchestrator
+        image: maximusmaxi/orchestrator:{{ .Values.orchestrator.version }}
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        - mountPath: /app/logs
+          name: orchestrator-logs
+        env:
+            - name: MONGODB_URL
+              value: "mongodb://mongodb:27017"
+      volumes:
+      - name: orchestrator-logs
+        persistentVolumeClaim:
+          claimName: orchestrator-pvc
